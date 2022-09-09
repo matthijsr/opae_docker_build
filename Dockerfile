@@ -54,7 +54,7 @@ RUN pip3 install Pybind11==2.10.0
 RUN pip3 install setuptools==59.6.0 --prefix=/usr
 
 # Open Programmable Acceleration Engine
-ARG OPAE_VERSION=2.0.1-3
+ARG OPAE_VERSION=2.0.2-1
 RUN git clone -b ${OPAE_VERSION} --single-branch https://github.com/OPAE/opae-sdk.git /opae-sdk && \
     mkdir -p /opae-sdk/build && \
     cd /opae-sdk/build && \
