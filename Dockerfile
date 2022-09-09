@@ -1,54 +1,74 @@
-FROM fedora:37
+FROM centos:7.7.1908
 
-# # Kernel and DFL drivers
-# RUN dnf install -y \
-#         gcc \
-#         gcc-c++ \
-#         make \
-#         kernel-headers \
-#         kernel-devel \
-#         elfutils-libelf-devel \
-#         ncurses-devel \
-#         openssl-devel \
-#         bison \
-#         flex
-
-# RUN dnf install -y git
-
-# RUN git clone https://github.com/OPAE/linux-dfl.git -b fpga-ofs-dev-5.15-lts /linux-dfl
-
-# RUN cd /linux-dfl && \
-#     cp /boot/config-`uname -r` .config && \
-#     cat configs/dfl-config >> .config && \
-#     echo 'CONFIG_LOCALVERSION="-dfl"' >> .config && \
-#     echo 'CONFIG_LOCALVERSION_AUTO=y' >> .config && \
-#     sed -i -r 's/CONFIG_SYSTEM_TRUSTED_KEYS=.*/CONFIG_SYSTEM_TRUSTED_KEYS=""/' .config && \
-#     sed -i '/^CONFIG_DEBUG_INFO_BTF/ s/./#&/' .config && \
-#     echo 'CONFIG_DEBUG_ATOMIC_SLEEP=y' >> .config && \
-#     make olddefconfig
-
-# RUN cd /linux-dfl && \
-#     make -j $(nproc) && \
-#     make modules_install -j $(nproc) && \
-#     make install
+RUN yum install -y epel-release
 
 # Dev/Build requirements
-RUN dnf install -y python3 python3-pip python3-devel python3-pybind11 python3-jsonschema cmake make libuuid-devel json-c-devel gcc clang gcc-c++ hwloc-devel tbb-devel rpm-build rpmdevtools git
-RUN dnf install -y libedit-devel
-RUN dnf install -y libudev-devel
-RUN dnf install -y libcap-devel
-RUN python3 -m pip install setuptools --upgrade
-RUN python3 -m pip install pyyaml jsonschema
+RUN yum install -y \
+        autoconf \
+        automake \
+        bison \
+        boost \
+        boost-devel \
+        cmake3 \
+        doxygen \
+        dwarves \
+        elfutils-libelf-devel \
+        flex \
+        gcc \
+        gcc-c++ \
+        git \
+        hwloc-devel \
+        json-c-devel \
+        libarchive \
+        libedit \
+        libedit-devel \
+        libpcap \
+        libpng12 \
+        libuuid \
+        libuuid-devel \
+        libxml2 \
+        libxml2-devel \
+        make \
+        ncurses \
+        spdlog \
+        cli11-devel \
+        python3-yaml \
+        python3-pybind11 \
+        ncurses-devel \
+        ncurses-libs \
+        openssl-devel \
+        python3-pip \
+        python3-devel \
+        python3-jsonschema \
+        rsync \
+        tbb-devel \
+        libudev-devel
+
+RUN python3 -m pip install --user \
+        jsonschema \
+        virtualenv \
+        pudb \
+        pyyaml
+
+RUN pip3 install Pybind11==2.10.0
+RUN pip3 install setuptools==59.6.0 --prefix=/usr
 
 # Open Programmable Acceleration Engine
 ARG OPAE_VERSION=2.0.9-4
 RUN git clone -b ${OPAE_VERSION} --single-branch https://github.com/OPAE/opae-sdk.git /opae-sdk
 
-RUN dnf install -y systemd
-RUN dnf install -y doxygen
+RUN mkdir -p /opae-sdk/build && \
+    cd /opae-sdk/build && \
+    cmake3 /opae-sdk \
+    -DCPACK_GENERATOR=RPM \
+    -DOPAE_BUILD_FPGABIST=ON \
+    -DOPAE_BUILD_PYTHON_DIST=ON \
+    -DCMAKE_BUILD_PREFIX=/usr && \
+    make -j `nproc`
 
-RUN cd /opae-sdk/packaging/opae/rpm && \
-    ./create fedora && \
-    dnf install ./*.rpm
+RUN make -j `nproc` package_rpm
+
+RUN cd /opae-sdk/build && \
+    dnf localinstall -y opae*.rpm
 
 WORKDIR /src
