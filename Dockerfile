@@ -54,15 +54,13 @@ RUN pip3 install Pybind11==2.10.0
 RUN pip3 install setuptools==59.6.0 --prefix=/usr
 
 # Open Programmable Acceleration Engine
-ARG OPAE_VERSION=2.0.9-4
+ARG OPAE_VERSION=2.0.1-3
 RUN git clone -b ${OPAE_VERSION} --single-branch https://github.com/OPAE/opae-sdk.git /opae-sdk && \
     mkdir -p /opae-sdk/build && \
     cd /opae-sdk/build && \
     cmake3 \
     -DCMAKE_BUILD_TYPE=Release \
-    -DOPAE_BUILD_LEGACY=ON \
-    -DOPAE_LEGACY_TAG=2.0.9-4 \
-    -DOPAE_ENABLE_MOCK=On \
+    -DOPAE_BUILD_SIM=On \
     -DOPAE_BUILD_LIBOPAE_PY=On \
     -DOPAE_BUILD_LIBOPAEVFIO=Off \
     -DOPAE_BUILD_PLUGIN_VFIO=Off \
