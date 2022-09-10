@@ -29,7 +29,9 @@ RUN dnf install -y /opae-sdk/rpm_packages/opae*.rpm && \
 
 # OPAE Simulator
 ARG OPAE_TAG=2.0.10-2
-RUN git clone -b ${OPAE_TAG} --single-branch https://github.com/OPAE/opae-sim.git /opae-sim && \
+RUN git clone https://github.com/OPAE/opae-sim.git /opae-sim && \
+    cd /opae-sim && \
+    git checkout ${OPAE_TAG} && \
     mkdir -p /opae-sim/build && \
     cd /opae-sim/build && \
     cmake3 \
