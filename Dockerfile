@@ -1,9 +1,12 @@
-FROM centos:7.7.1908
+FROM quay.io/centos/centos:stream8
 
-RUN yum install -y epel-release
+RUN dnf install -y dnf-plugins-core && \
+    dnf install -y epel-release && \
+    dnf config-manager --enable epel && \
+    dnf config-manager --set-enabled powertools
 
 # Dev/Build requirements
-RUN yum install -y \
+RUN dnf install -y \
         autoconf \
         automake \
         bison \
@@ -50,24 +53,25 @@ RUN python3 -m pip install --user \
         pudb \
         pyyaml
 
+RUN pip3 uninstall -y setuptools
 RUN pip3 install Pybind11==2.10.0
 RUN pip3 install setuptools==59.6.0 --prefix=/usr
 
-# Open Programmable Acceleration Engine
-ARG OPAE_VERSION=2.0.2-1
-RUN git clone -b ${OPAE_VERSION} --single-branch https://github.com/OPAE/opae-sdk.git /opae-sdk && \
-    mkdir -p /opae-sdk/build && \
-    cd /opae-sdk/build && \
-    cmake3 \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DOPAE_BUILD_SIM=On \
-    -DOPAE_BUILD_LIBOPAE_PY=On \
-    -DOPAE_BUILD_LIBOPAEVFIO=Off \
-    -DOPAE_BUILD_PLUGIN_VFIO=Off \
-    -DOPAE_BUILD_EXTRA_TOOLS=On  \
-	-DCMAKE_INSTALL_PREFIX=/usr /opae-sdk && \
-    make -j && \
-    make install && \
-    rm -rf /opae-sdk
+# # Open Programmable Acceleration Engine
+# ARG OPAE_VERSION=2.1.0-2
+# RUN git clone -b ${OPAE_VERSION} --single-branch https://github.com/OPAE/opae-sdk.git /opae-sdk && \
+#     mkdir -p /opae-sdk/build && \
+#     cd /opae-sdk/build && \
+#     cmake3 \
+#     -DCMAKE_BUILD_TYPE=Debug \
+#     -DOPAE_BUILD_SIM=On \
+#     -DOPAE_BUILD_LIBOPAE_PY=On \
+#     -DOPAE_BUILD_LIBOPAEVFIO=Off \
+#     -DOPAE_BUILD_PLUGIN_VFIO=Off \
+#     -DOPAE_BUILD_EXTRA_TOOLS=On  \
+# 	-DCMAKE_INSTALL_PREFIX=/usr /opae-sdk && \
+#     make -j && \
+#     make install && \
+#     rm -rf /opae-sdk
 
 WORKDIR /src
