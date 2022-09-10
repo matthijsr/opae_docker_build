@@ -1,51 +1,15 @@
 FROM quay.io/centos/centos:stream8
 
 RUN dnf install -y dnf-plugins-core && \
+    dnf config-manager --set-enabled powertools && \
     dnf install -y epel-release && \
-    dnf config-manager --enable epel && \
-    dnf config-manager --set-enabled powertools
+    dnf config-manager --enable epel 
 
 # Dev/Build requirements
-RUN dnf install -y \
-        autoconf \
-        automake \
-        bison \
-        boost \
-        boost-devel \
-        cmake3 \
-        doxygen \
-        dwarves \
-        elfutils-libelf-devel \
-        flex \
-        gcc \
-        gcc-c++ \
-        git \
-        hwloc-devel \
-        json-c-devel \
-        libarchive \
-        libedit \
-        libedit-devel \
-        libpcap \
-        libpng12 \
-        libuuid \
-        libuuid-devel \
-        libxml2 \
-        libxml2-devel \
-        make \
-        ncurses \
-        spdlog \
-        cli11-devel \
-        python3-yaml \
-        python3-pybind11 \
-        ncurses-devel \
-        ncurses-libs \
-        openssl-devel \
-        python3-pip \
-        python3-devel \
-        python3-jsonschema \
-        rsync \
-        tbb-devel \
-        libudev-devel
+RUN dnf install -y python3 python3-pip python3-devel python3-pybind11 cmake make libuuid-devel json-c-devel gcc clang gcc-c++ hwloc-devel tbb-devel rpm-build rpmdevtools git
+RUN dnf install -y libedit-devel
+RUN dnf install -y libudev-devel
+RUN dnf install -y libcap-devel
 
 RUN python3 -m pip install --user \
         jsonschema \
@@ -74,4 +38,7 @@ RUN pip3 install setuptools==59.6.0 --prefix=/usr
 #     make install && \
 #     rm -rf /opae-sdk
 
-WORKDIR /src
+WORKDIR /root
+COPY artifacts/opae-sdk/scripts/build-rpms.sh /scripts/build-rpms.sh
+COPY artifacts/opae-sdk/scripts/test-rpms.sh /scripts/test-rpms.sh
+ENTRYPOINT [ "/scripts/build-rpms.sh" ]
