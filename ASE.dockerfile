@@ -21,13 +21,14 @@ RUN pip3 uninstall -y setuptools
 RUN pip3 install Pybind11==2.10.0
 RUN pip3 install setuptools==59.6.0 --prefix=/usr
 
-ADD artifacts/rpm_packages /rpm_packages
+COPY artifacts/opae-sdk /opae-sdk
 
-RUN cd /rpm_packages && \
-    dnf install -y opae*.rpm
+# Install OPAE and headers
+RUN dnf install -y /opae-sdk/rpm_packages/opae*.rpm && \
+    cmake3 -P /opae-sdk/rpm_packages/cmake_install.cmake
 
-#  OPAE Simulator
-ARG OPAE_TAG=2.0.9-4
+# OPAE Simulator
+ARG OPAE_TAG=2.0.10-2
 RUN git clone -b ${OPAE_TAG} --single-branch https://github.com/OPAE/opae-sim.git /opae-sim && \
     mkdir -p /opae-sim/build && \
     cd /opae-sim/build && \
@@ -36,6 +37,7 @@ RUN git clone -b ${OPAE_TAG} --single-branch https://github.com/OPAE/opae-sim.gi
 	-DCMAKE_INSTALL_PREFIX=/usr /opae-sim && \
     make && \
     make install && \
-    rm -rf /opae-sim
+    rm -rf /opae-sim && \
+    rm -rf /opae-sdk
 
 WORKDIR /src
