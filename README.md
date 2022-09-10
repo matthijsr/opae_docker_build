@@ -27,4 +27,8 @@ Example:
 
 Note that it is possible to specify different versions between the OPAE SDK and simulator (in fact, this may be necessary, as their respective versions do not necessarily align), though correct behavior cannot be guaranteed.
 
-Known issues: The vast majority of `opae-sim` versions do not build or install correctly with versions of OPAE newer than 2.0.1. The commits used in the examples are rare exceptions.
+Known issues: The vast majority of `opae-sim` versions do not build or install correctly with versions of OPAE newer than 2.0.1. The commits used in the examples are rare exceptions. (This appears to be an issue with opae-sdk not properly installing cmake modules?)
+
+## Building both OPAE and ASE in the same container 
+`Dev.dockerfile` serves as an example of building a more comprehensive toolchain in a single container/image. Nonetheless, it can be easily built with the included `setup_dev.sh $1 $2` script.
+The first argument corresponds to the `opae-sdk` commit, tag, or branch, while the latter applies to `opae-sim`.
