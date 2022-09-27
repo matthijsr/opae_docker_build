@@ -1,4 +1,4 @@
-FROM quay.io/centos/centos:stream8
+FROM centos:7.7.1908
 
 RUN dnf install -y dnf-plugins-core && \
     dnf config-manager --set-enabled powertools && \
