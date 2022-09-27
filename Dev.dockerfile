@@ -36,22 +36,21 @@ RUN git clone https://github.com/OPAE/opae-sdk.git /opae-sdk && \
     -DOPAE_BUILD_EXTRA_TOOLS=On \
 	-DCMAKE_INSTALL_PREFIX=/usr /opae-sdk && \
     make -j && \
-    make install && \
-    cmake3 -P cmake_install.cmake
+    make install
 
-# OPAE Simulator
-ARG OPAE_SIM=f8e7bd5e876a5b913fb53d6fc85653211eb7af3f
-RUN git clone https://github.com/OPAE/opae-sim.git /opae-sim && \
-    cd /opae-sim && \
-    git checkout ${OPAE_SIM} && \
-    mkdir -p /opae-sim/build && \
-    cd /opae-sim/build && \
-    cmake3 \
-    -DCMAKE_BUILD_TYPE=Release \
-	-DCMAKE_INSTALL_PREFIX=/usr /opae-sim && \
-    make && \
-    make install && \
-    rm -rf /opae-sim && \
-    rm -rf /opae-sdk
+# # OPAE Simulator
+# ARG OPAE_SIM=f8e7bd5e876a5b913fb53d6fc85653211eb7af3f
+# RUN git clone https://github.com/OPAE/opae-sim.git /opae-sim && \
+#     cd /opae-sim && \
+#     git checkout ${OPAE_SIM} && \
+#     mkdir -p /opae-sim/build && \
+#     cd /opae-sim/build && \
+#     cmake3 \
+#     -DCMAKE_BUILD_TYPE=Release \
+# 	-DCMAKE_INSTALL_PREFIX=/usr /opae-sim && \
+#     make && \
+#     make install && \
+#     rm -rf /opae-sim && \
+#     rm -rf /opae-sdk
 
 WORKDIR /src
